@@ -19,6 +19,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 1;
   }
 
   .content {
@@ -34,6 +35,13 @@
   .content h1 {
     font-size: 3em;
     margin: 0;
+    animation: glow 2s infinite alternate;
+  }
+
+  @keyframes glow {
+    0% { text-shadow: 0 0 5px #ff4d4d, 0 0 10px #ffdb4d; }
+    50% { text-shadow: 0 0 20px #ff4d4d, 0 0 30px #ffdb4d; }
+    100% { text-shadow: 0 0 5px #ff4d4d, 0 0 10px #ffdb4d; }
   }
 
   .content p {
@@ -63,17 +71,8 @@
     cursor: pointer;
   }
 
-  .whatsapp-btn { 
-    background-color: #25D366; 
-    color: white; 
-    right: 20px; 
-  }
-
-  .music-btn { 
-    background-color: #ff4d4d; 
-    color: white; 
-    right: 100px; 
-  }
+  .whatsapp-btn { background-color: #25D366; color: white; right: 20px; }
+  .music-btn { background-color: #ff4d4d; color: white; right: 100px; }
 
   /* Start overlay */
   #startScreen {
@@ -89,20 +88,22 @@
     z-index:100;
   }
 
-  #startScreen button {
-    font-size:1.5em;
-    padding:20px 30px;
+  #startBtn {
+    font-size:1.8em;
+    padding:25px 40px;
     border:none;
-    border-radius:10px;
+    border-radius:15px;
     cursor:pointer;
     background:#ff4d4d;
     color:white;
+    animation: pulse 1.2s infinite;
+    box-shadow: 0 0 20px #ff4d4d;
   }
 
-  /* Adjust buttons on small screens */
-  @media (max-width: 400px) {
-    .music-btn { right: 120px; } /* move slightly to prevent overlap */
-    .whatsapp-btn { right: 20px; }
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 20px #ff4d4d; }
+    50% { transform: scale(1.1); box-shadow: 0 0 40px #ff4d4d; }
+    100% { transform: scale(1); box-shadow: 0 0 20px #ff4d4d; }
   }
 </style>
 </head>
@@ -130,11 +131,11 @@
 
 <!-- Start overlay for mobile auto-play -->
 <div id="startScreen">
-  <button onclick="startMusic()">Start 🎆</button>
+  <button id="startBtn" onclick="startCelebration()">🎇 Click to Celebrate 🎆</button>
 </div>
 
 <script>
-// Fireworks setup
+// Canvas setup
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -145,6 +146,7 @@ window.addEventListener("resize", () => {
   canvas.height = window.innerHeight;
 });
 
+// Particle class for fireworks
 class Particle {
   constructor(x, y, color, life) {
     this.x = x; this.y = y;
@@ -162,9 +164,9 @@ class Particle {
 }
 
 const particles = [];
-function createFirework() {
-  const x = Math.random() * canvas.width;
-  const y = Math.random() * canvas.height/2;
+function createFirework(x=null, y=null) {
+  x = x || Math.random() * canvas.width;
+  y = y || Math.random() * canvas.height/2;
   const colors = ["#ff4d4d","#ffdb4d","#4dff88","#4da6ff","#ff4da6"];
   for(let i=0;i<100;i++){
     particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)],50));
@@ -175,36 +177,72 @@ function animate() {
   ctx.fillStyle = "rgba(0,0,0,0.1)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
+  // Random fireworks
   if (Math.random() < 0.05) createFirework();
 
+  // Update particles
   particles.forEach((p,index)=>{
     p.update();
     p.draw();
     if(p.life<=0) particles.splice(index,1);
   });
 
+  // Floating stars
+  for(let i=0;i<5;i++){
+    ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
+    ctx.beginPath();
+    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
   requestAnimationFrame(animate);
 }
 animate();
+
+// Confetti
+let confettiPieces = [];
+function createConfetti() {
+  for(let i=0;i<200;i++){
+    confettiPieces.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      color: `hsl(${Math.random()*360},100%,50%)`,
+      size: Math.random()*6+4,
+      vy: Math.random()*3+2,
+      vx: Math.random()*2-1
+    });
+  }
+}
+
+function drawConfetti() {
+  confettiPieces.forEach((c,index)=>{
+    c.y += c.vy;
+    c.x += c.vx;
+    ctx.fillStyle = c.color;
+    ctx.fillRect(c.x, c.y, c.size, c.size);
+    if(c.y > canvas.height) confettiPieces.splice(index,1);
+  });
+  requestAnimationFrame(drawConfetti);
+}
 
 // URL Parameters
 const params = new URLSearchParams(window.location.search);
 const to = params.get("to");
 const from = params.get("from");
-
 if (to) document.getElementById("title").innerText = `🎆 Happy New Year, ${to}! 🎆`;
 if (from) document.getElementById("fromText").innerText = `— From ${from} ❤️`;
 
 // Music setup
 const music = document.getElementById("bgMusic");
 
-// Start overlay function
-function startMusic() {
+// Start celebration
+function startCelebration() {
   document.getElementById("startScreen").style.display = "none";
   music.play();
+  createConfetti();
 }
 
-// Music button
+// Music toggle
 function toggleMusic() {
   if(music.paused){ music.play(); } else { music.pause(); }
 }
@@ -217,6 +255,12 @@ function shareWhatsApp() {
   const waUrl = "https://wa.me/?text=" + encodeURIComponent(message);
   window.open(waUrl, "_blank");
 }
+
+// Click anywhere for extra fireworks
+canvas.addEventListener("click", (e)=>{ createFirework(e.clientX,e.clientY); });
+
+// Draw confetti continuously
+drawConfetti();
 </script>
 
 </body>
