@@ -28,6 +28,7 @@
     transform: translate(-50%, -50%);
     text-align: center;
     z-index: 10;
+    width: 90%;
   }
 
   .content h1 {
@@ -54,7 +55,6 @@
   .whatsapp-btn, .music-btn {
     position: fixed;
     bottom: 20px;
-    right: 20px;
     z-index: 20;
     padding: 10px 14px;
     border: none;
@@ -82,7 +82,7 @@
 </div>
 
 <!-- Music + Buttons -->
-<audio id="bgMusic" loop autoplay muted>
+<audio id="bgMusic" loop autoplay muted style="display:none;">
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
@@ -96,11 +96,10 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-function resize() {
+window.addEventListener("resize", () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resize);
+});
 
 class Particle {
   constructor(x, y, color, life) {
@@ -155,7 +154,7 @@ if (from) document.getElementById("fromText").innerText = `— From ${from} ❤�
 // Music setup
 const music = document.getElementById("bgMusic");
 
-// Unmute after small delay to enable auto-play
+// Auto-play music (try to unmute)
 window.addEventListener("load", () => {
   setTimeout(() => {
     music.muted = false;
