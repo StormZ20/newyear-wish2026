@@ -72,7 +72,7 @@
   .music-btn { 
     background-color: #ff4d4d; 
     color: white; 
-    right: 140px; 
+    right: 100px; 
   }
 
   /* Start overlay */
@@ -97,6 +97,12 @@
     cursor:pointer;
     background:#ff4d4d;
     color:white;
+  }
+
+  /* Adjust buttons on small screens */
+  @media (max-width: 400px) {
+    .music-btn { right: 120px; } /* move slightly to prevent overlap */
+    .whatsapp-btn { right: 20px; }
   }
 </style>
 </head>
