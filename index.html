@@ -5,50 +5,49 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Happy New Year 🎆</title>
 <style>
-    body {
-        margin: 0;
-        background: black;
-        overflow: hidden;
-        font-family: 'Segoe UI', sans-serif;
-        color: white;
-    }
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+  }
 
-    canvas {
-        position: fixed;
-        top: 0;
-        left: 0;
-    }
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 
-    .content {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        z-index: 10;
-        padding: 20px;
-    }
+  .content {
+    position: relative;
+    text-align: center;
+    top: 30%;
+    z-index: 10;
+  }
 
-    h1 {
-        font-size: 2.6em;
-        margin-bottom: 15px;
-    }
+  .content h1 {
+    font-size: 3em;
+    margin: 0;
+  }
 
-    p {
-        font-size: 1.1em;
-        opacity: 0.9;
-    }
+  .content p {
+    font-size: 1.2em;
+    margin-top: 25px;
+    font-style: italic;
+    opacity: 0.8;
+  }
 
-    .from {
-        margin-top: 25px;
-        font-style: italic;
-        opacity: 0.8;
-    }
+  .from {
+    margin-top: 20px;
+  }
 
-    @media (max-width: 600px) {
-        h1 { font-size: 2em; }
-        p { font-size: 1em; }
-    }
+  @media (max-width: 600px) {
+    h1 { font-size: 2em; }
+    p { font-size: 1em; }
+  }
 </style>
 </head>
 <body>
@@ -56,122 +55,82 @@
 <canvas id="canvas"></canvas>
 
 <div class="content">
-    <h1 id="title">🎆 Happy New Year 🎆</h1>
-    <p>
-        May this new year bring you happiness, success,  
-        peace, and unforgettable moments ✨  
-        <br><br>
-        Cheers to new beginnings 🥂
-    </p>
-    <div class="from" id="fromText"></div>
+  <h1 id="title">🎆 Happy New Year 🎆</h1>
+  <p>
+    May this new year bring you happiness, success, peace, and unforgettable moments ✨  
+    <br><br>
+    Cheers to new beginnings 🥂
+  </p>
+  <div class="from" id="fromText"></div>
 </div>
-<!-- Background Music -->
+
+<!-- Music + Buttons -->
 <audio id="bgMusic" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Floating Buttons -->
 <div style="position:fixed;bottom:20px;right:20px;z-index:20;">
-  <button onclick="toggleMusic()" 
-    style="padding:10px 14px;border:none;border-radius:50px;">
+  <button onclick="toggleMusic()" style="padding:10px 14px;border:none;border-radius:50px;">
     🎵 Music
   </button>
 
-  <button onclick="shareWhatsApp()" 
-    style="padding:10px 14px;border:none;border-radius:50px;margin-left:6px;">
+  <button onclick="shareWhatsApp()" style="padding:10px 14px;border:none;border-radius:50px;margin-left:6px;">
     📲 WhatsApp
   </button>
 </div>
-function toggleMusic() {
-  const music = document.getElementById("bgMusic");
-  if (music.paused) {
-    music.play();
-  } else {
-    music.pause();
+
+<script>
+// Fireworks setup
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+
+class Particle {
+  constructor(x, y, color, life) {
+    this.x = x; this.y = y;
+    this.color = color; this.life = life;
+    this.vx = (Math.random() - 0.5) * 4;
+    this.vy = (Math.random() - 0.5) * 4;
+  }
+  update() { this.x += this.vx; this.y += this.vy; this.life -= 1; }
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 2, 0, Math.PI*2);
+    ctx.fill();
   }
 }
 
-function shareWhatsApp() {
-  const params = new URLSearchParams(window.location.search);
-  const to = params.get("to") || "you";
-  const from = params.get("from") || "me";
-
-  const message =
-`🎆 Happy New Year, ${to}! 🎆
-
-May this year bring you happiness, success and peace ✨
-
-— From ${from}`;
-
-  const waUrl = "https://wa.me/?text=" + encodeURIComponent(message);
-  window.open(waUrl, "_blank");
-}
-
-<script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-resize();
-window.addEventListener("resize", resize);
-
-let particles = [];
-
-function random(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
-class Particle {
-    constructor(x, y, color) {
-        this.x = x;
-        this.y = y;
-        this.radius = random(1.5, 3);
-        this.color = color;
-        this.speedX = random(-4, 4);
-        this.speedY = random(-4, 4);
-        this.life = 100;
-    }
-    update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        this.speedY += 0.05;
-        this.life--;
-    }
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-    }
-}
-
+const particles = [];
 function createFirework() {
-    const x = random(100, canvas.width - 100);
-    const y = random(50, canvas.height / 2);
-    const color = `hsl(${random(0,360)},100%,60%)`;
-    for (let i = 0; i < 80; i++) {
-        particles.push(new Particle(x, y, color));
-    }
+  const x = Math.random() * canvas.width;
+  const y = Math.random() * canvas.height/2;
+  const colors = ["#ff4d4d","#ffdb4d","#4dff88","#4da6ff","#ff4da6"];
+  for(let i=0;i<100;i++){
+    particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)],50));
+  }
 }
 
 function animate() {
-    ctx.fillStyle = "rgba(0,0,0,0.2)";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(0,0,0,0.1)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-    if (Math.random() < 0.05) {
-        createFirework();
-    }
+  if (Math.random() < 0.05) createFirework();
 
-    particles.forEach((p, index) => {
-        p.update();
-        p.draw();
-        if (p.life <= 0) particles.splice(index, 1);
-    });
+  particles.forEach((p,index)=>{
+    p.update();
+    p.draw();
+    if(p.life<=0) particles.splice(index,1);
+  });
 
-    requestAnimationFrame(animate);
+  requestAnimationFrame(animate);
 }
 animate();
 
@@ -180,14 +139,31 @@ const params = new URLSearchParams(window.location.search);
 const to = params.get("to");
 const from = params.get("from");
 
-if (to) {
-    document.getElementById("title").innerHTML =
-        `🎆 Happy New Year, ${to}! 🎆`;
+if (to) document.getElementById("title").innerText = `🎆 Happy New Year, ${to}! 🎆`;
+if (from) document.getElementById("fromText").innerText = `— From ${from} ❤️`;
+
+// Music + WhatsApp
+const music = document.getElementById("bgMusic");
+
+// Auto-play after first click
+let musicPlayed = false;
+window.addEventListener("click", () => {
+  if(!musicPlayed){
+    music.play().catch(err=>console.log("Auto-play blocked:", err));
+    musicPlayed = true;
+  }
+});
+
+function toggleMusic(){
+  if(music.paused){ music.play(); } else { music.pause(); }
 }
 
-if (from) {
-    document.getElementById("fromText").innerHTML =
-        `— From ${from} 🤍`;
+function shareWhatsApp(){
+  const toParam = params.get("to") || "you";
+  const fromParam = params.get("from") || "me";
+  const message = `🎆 Happy New Year, ${toParam}! 🎆\n\nMay this year bring you happiness, success and peace ✨\n\n— From ${fromParam}`;
+  const waUrl = "https://wa.me/?text="+encodeURIComponent(message);
+  window.open(waUrl,"_blank");
 }
 </script>
 
