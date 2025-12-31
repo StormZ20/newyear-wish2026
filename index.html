@@ -78,6 +78,13 @@
     📲 WhatsApp
   </button>
 </div>
+let musicPlayed = false;
+window.addEventListener("click", () => {
+  if (!musicPlayed) {
+    music.play().catch(err => console.log("Auto-play blocked:", err));
+    musicPlayed = true;
+  }
+});
 
 <script>
 // Fireworks setup
