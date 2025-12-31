@@ -173,6 +173,9 @@ function createFirework(x=null,y=null){
   for(let i=0;i<100;i++){particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)],50));}
 }
 
+let confettiPieces=[];
+function createConfetti(){for(let i=0;i<200;i++){confettiPieces.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,color:`hsl(${Math.random()*360},100%,50%)`,size:Math.random()*6+4,vy:Math.random()*3+2,vx:Math.random()*2-1});}}
+
 function animate(){
   ctx.fillStyle="rgba(0,0,0,0.1)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -183,10 +186,6 @@ function animate(){
   requestAnimationFrame(animate);
 }
 animate();
-
-// Confetti
-let confettiPieces=[];
-function createConfetti(){for(let i=0;i<200;i++){confettiPieces.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,color:`hsl(${Math.random()*360},100%,50%)`,size:Math.random()*6+4,vy:Math.random()*3+2,vx:Math.random()*2-1});}}
 
 // URL Parameters
 const params=new URLSearchParams(window.location.search);
