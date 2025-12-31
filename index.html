@@ -60,10 +60,18 @@
     p { font-size: 1em; }
   }
 
-  .whatsapp-btn, .music-btn {
+  /* Buttons container */
+  #buttonContainer {
     position: fixed;
     bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
     z-index: 20;
+  }
+
+  .music-btn, .whatsapp-btn {
     padding: 10px 14px;
     border: none;
     border-radius: 50px;
@@ -71,8 +79,13 @@
     cursor: pointer;
   }
 
-  .whatsapp-btn { background-color: #25D366; color: white; right: 20px; }
-  .music-btn { background-color: #ff4d4d; color: white; right: 100px; }
+  .music-btn { background-color: #ff4d4d; color: white; }
+  .whatsapp-btn { background-color: #25D366; color: white; }
+
+  @media (max-width: 400px) {
+    #buttonContainer { gap: 10px; }
+    .music-btn, .whatsapp-btn { padding: 8px 12px; font-size: 0.9em; }
+  }
 
   /* Start overlay */
   #startScreen {
@@ -121,13 +134,16 @@
   <div class="from" id="fromText"></div>
 </div>
 
-<!-- Music + Buttons -->
+<!-- Buttons container -->
+<div id="buttonContainer">
+  <button class="music-btn" onclick="toggleMusic()">🎵 Music</button>
+  <button class="whatsapp-btn" onclick="shareWhatsApp()">📲 WhatsApp</button>
+</div>
+
+<!-- Music -->
 <audio id="bgMusic" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
-
-<button class="music-btn" onclick="toggleMusic()">🎵 Music</button>
-<button class="whatsapp-btn" onclick="shareWhatsApp()">📲 WhatsApp</button>
 
 <!-- Start overlay for mobile auto-play -->
 <div id="startScreen">
@@ -140,127 +156,58 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
+window.addEventListener("resize", ()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
 
 // Particle class for fireworks
 class Particle {
-  constructor(x, y, color, life) {
-    this.x = x; this.y = y;
-    this.color = color; this.life = life;
-    this.vx = (Math.random() - 0.5) * 4;
-    this.vy = (Math.random() - 0.5) * 4;
-  }
-  update() { this.x += this.vx; this.y += this.vy; this.life -= 1; }
-  draw() {
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 2, 0, Math.PI*2);
-    ctx.fill();
-  }
+  constructor(x,y,color,life){ this.x=x; this.y=y; this.color=color; this.life=life; this.vx=(Math.random()-0.5)*4; this.vy=(Math.random()-0.5)*4; }
+  update(){ this.x+=this.vx; this.y+=this.vy; this.life-=1; }
+  draw(){ ctx.fillStyle=this.color; ctx.beginPath(); ctx.arc(this.x,this.y,2,0,Math.PI*2); ctx.fill(); }
 }
 
-const particles = [];
-function createFirework(x=null, y=null) {
-  x = x || Math.random() * canvas.width;
-  y = y || Math.random() * canvas.height/2;
-  const colors = ["#ff4d4d","#ffdb4d","#4dff88","#4da6ff","#ff4da6"];
-  for(let i=0;i<100;i++){
-    particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)],50));
-  }
+const particles=[];
+function createFirework(x=null,y=null){
+  x=x||Math.random()*canvas.width;
+  y=y||Math.random()*canvas.height/2;
+  const colors=["#ff4d4d","#ffdb4d","#4dff88","#4da6ff","#ff4da6"];
+  for(let i=0;i<100;i++){particles.push(new Particle(x,y,colors[Math.floor(Math.random()*colors.length)],50));}
 }
 
-function animate() {
-  ctx.fillStyle = "rgba(0,0,0,0.1)";
+function animate(){
+  ctx.fillStyle="rgba(0,0,0,0.1)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // Random fireworks
-  if (Math.random() < 0.05) createFirework();
-
-  // Update particles
-  particles.forEach((p,index)=>{
-    p.update();
-    p.draw();
-    if(p.life<=0) particles.splice(index,1);
-  });
-
-  // Floating stars
-  for(let i=0;i<5;i++){
-    ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
-    ctx.beginPath();
-    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, Math.random()*2, 0, Math.PI*2);
-    ctx.fill();
-  }
-
+  if(Math.random()<0.05) createFirework();
+  particles.forEach((p,index)=>{p.update();p.draw();if(p.life<=0) particles.splice(index,1);});
+  for(let i=0;i<5;i++){ctx.fillStyle=`rgba(255,255,255,${Math.random()})`;ctx.beginPath();ctx.arc(Math.random()*canvas.width,Math.random()*canvas.height,Math.random()*2,0,Math.PI*2);ctx.fill();}
+  confettiPieces.forEach((c,i)=>{c.y+=c.vy;c.x+=c.vx;ctx.fillStyle=c.color;ctx.fillRect(c.x,c.y,c.size,c.size);if(c.y>canvas.height) confettiPieces.splice(i,1);});
   requestAnimationFrame(animate);
 }
 animate();
 
 // Confetti
-let confettiPieces = [];
-function createConfetti() {
-  for(let i=0;i<200;i++){
-    confettiPieces.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height,
-      color: `hsl(${Math.random()*360},100%,50%)`,
-      size: Math.random()*6+4,
-      vy: Math.random()*3+2,
-      vx: Math.random()*2-1
-    });
-  }
-}
-
-function drawConfetti() {
-  confettiPieces.forEach((c,index)=>{
-    c.y += c.vy;
-    c.x += c.vx;
-    ctx.fillStyle = c.color;
-    ctx.fillRect(c.x, c.y, c.size, c.size);
-    if(c.y > canvas.height) confettiPieces.splice(index,1);
-  });
-  requestAnimationFrame(drawConfetti);
-}
+let confettiPieces=[];
+function createConfetti(){for(let i=0;i<200;i++){confettiPieces.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,color:`hsl(${Math.random()*360},100%,50%)`,size:Math.random()*6+4,vy:Math.random()*3+2,vx:Math.random()*2-1});}}
 
 // URL Parameters
-const params = new URLSearchParams(window.location.search);
-const to = params.get("to");
-const from = params.get("from");
-if (to) document.getElementById("title").innerText = `🎆 Happy New Year, ${to}! 🎆`;
-if (from) document.getElementById("fromText").innerText = `— From ${from} ❤️`;
+const params=new URLSearchParams(window.location.search);
+const to=params.get("to"); const from=params.get("from");
+if(to) document.getElementById("title").innerText=`🎆 Happy New Year, ${to}! 🎆`;
+if(from) document.getElementById("fromText").innerText=`— From ${from} ❤️`;
 
-// Music setup
-const music = document.getElementById("bgMusic");
+// Music
+const music=document.getElementById("bgMusic");
 
 // Start celebration
-function startCelebration() {
-  document.getElementById("startScreen").style.display = "none";
-  music.play();
-  createConfetti();
-}
+function startCelebration(){document.getElementById("startScreen").style.display="none";music.play();createConfetti();}
 
 // Music toggle
-function toggleMusic() {
-  if(music.paused){ music.play(); } else { music.pause(); }
-}
+function toggleMusic(){if(music.paused){music.play();}else{music.pause();}}
 
-// WhatsApp button
-function shareWhatsApp() {
-  const toParam = params.get("to") || "you";
-  const fromParam = params.get("from") || "me";
-  const message = `🎆 Happy New Year, ${toParam}! 🎆\n\nMay this year bring you happiness, success and peace ✨\n\n— From ${fromParam}`;
-  const waUrl = "https://wa.me/?text=" + encodeURIComponent(message);
-  window.open(waUrl, "_blank");
-}
+// WhatsApp
+function shareWhatsApp(){const toParam=params.get("to")||"you";const fromParam=params.get("from")||"me";const message=`🎆 Happy New Year, ${toParam}! 🎆\n\nMay this year bring you happiness, success and peace ✨\n\n— From ${fromParam}`;window.open("https://wa.me/?text="+encodeURIComponent(message),"_blank");}
 
-// Click anywhere for extra fireworks
-canvas.addEventListener("click", (e)=>{ createFirework(e.clientX,e.clientY); });
-
-// Draw confetti continuously
-drawConfetti();
+// Click canvas for extra fireworks
+canvas.addEventListener("click",(e)=>{createFirework(e.clientX,e.clientY);});
 </script>
 
 </body>
