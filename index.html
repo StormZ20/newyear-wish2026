@@ -21,14 +21,14 @@
     height: 100%;
   }
 
-.content {
+  .content {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     z-index: 10;
-}
+  }
 
   .content h1 {
     font-size: 3em;
@@ -50,6 +50,21 @@
     h1 { font-size: 2em; }
     p { font-size: 1em; }
   }
+
+  .whatsapp-btn, .music-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 20;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .whatsapp-btn { background-color: #25D366; color: white; right: 20px; }
+  .music-btn { background-color: #ff4d4d; color: white; right: 100px; }
 </style>
 </head>
 <body>
@@ -67,26 +82,12 @@
 </div>
 
 <!-- Music + Buttons -->
-<audio id="bgMusic" loop>
+<audio id="bgMusic" loop autoplay muted>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
-<div style="position:fixed;bottom:20px;right:20px;z-index:20;">
-  <button onclick="toggleMusic()" style="padding:10px 14px;border:none;border-radius:50px;">
-    🎵 Music
-  </button>
-
-  <button onclick="shareWhatsApp()" style="padding:10px 14px;border:none;border-radius:50px;margin-left:6px;">
-    📲 WhatsApp
-  </button>
-</div>
-let musicPlayed = false;
-window.addEventListener("click", () => {
-  if (!musicPlayed) {
-    music.play().catch(err => console.log("Auto-play blocked:", err));
-    musicPlayed = true;
-  }
-});
+<button class="music-btn" onclick="toggleMusic()">🎵 Music</button>
+<button class="whatsapp-btn" onclick="shareWhatsApp()">📲 WhatsApp</button>
 
 <script>
 // Fireworks setup
@@ -151,28 +152,28 @@ const from = params.get("from");
 if (to) document.getElementById("title").innerText = `🎆 Happy New Year, ${to}! 🎆`;
 if (from) document.getElementById("fromText").innerText = `— From ${from} ❤️`;
 
-// Music + WhatsApp
+// Music setup
 const music = document.getElementById("bgMusic");
 
-// Auto-play after first click
-let musicPlayed = false;
-window.addEventListener("click", () => {
-  if(!musicPlayed){
-    music.play().catch(err=>console.log("Auto-play blocked:", err));
-    musicPlayed = true;
-  }
+// Unmute after small delay to enable auto-play
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    music.muted = false;
+    music.play().catch(err => console.log("Auto-play blocked:", err));
+  }, 500);
 });
 
-function toggleMusic(){
+function toggleMusic() {
   if(music.paused){ music.play(); } else { music.pause(); }
 }
 
-function shareWhatsApp(){
+// WhatsApp button
+function shareWhatsApp() {
   const toParam = params.get("to") || "you";
   const fromParam = params.get("from") || "me";
   const message = `🎆 Happy New Year, ${toParam}! 🎆\n\nMay this year bring you happiness, success and peace ✨\n\n— From ${fromParam}`;
-  const waUrl = "https://wa.me/?text="+encodeURIComponent(message);
-  window.open(waUrl,"_blank");
+  const waUrl = "https://wa.me/?text=" + encodeURIComponent(message);
+  window.open(waUrl, "_blank");
 }
 </script>
 
