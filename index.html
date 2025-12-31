@@ -63,8 +63,41 @@
     cursor: pointer;
   }
 
-  .whatsapp-btn { background-color: #25D366; color: white; right: 20px; }
-  .music-btn { background-color: #ff4d4d; color: white; right: 100px; }
+  .whatsapp-btn { 
+    background-color: #25D366; 
+    color: white; 
+    right: 20px; 
+  }
+
+  .music-btn { 
+    background-color: #ff4d4d; 
+    color: white; 
+    right: 140px; 
+  }
+
+  /* Start overlay */
+  #startScreen {
+    position: absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:100;
+  }
+
+  #startScreen button {
+    font-size:1.5em;
+    padding:20px 30px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#ff4d4d;
+    color:white;
+  }
 </style>
 </head>
 <body>
@@ -82,12 +115,17 @@
 </div>
 
 <!-- Music + Buttons -->
-<audio id="bgMusic" loop autoplay muted style="display:none;">
+<audio id="bgMusic" loop>
   <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <button class="music-btn" onclick="toggleMusic()">🎵 Music</button>
 <button class="whatsapp-btn" onclick="shareWhatsApp()">📲 WhatsApp</button>
+
+<!-- Start overlay for mobile auto-play -->
+<div id="startScreen">
+  <button onclick="startMusic()">Start 🎆</button>
+</div>
 
 <script>
 // Fireworks setup
@@ -154,14 +192,13 @@ if (from) document.getElementById("fromText").innerText = `— From ${from} ❤�
 // Music setup
 const music = document.getElementById("bgMusic");
 
-// Auto-play music (try to unmute)
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    music.muted = false;
-    music.play().catch(err => console.log("Auto-play blocked:", err));
-  }, 500);
-});
+// Start overlay function
+function startMusic() {
+  document.getElementById("startScreen").style.display = "none";
+  music.play();
+}
 
+// Music button
 function toggleMusic() {
   if(music.paused){ music.play(); } else { music.pause(); }
 }
